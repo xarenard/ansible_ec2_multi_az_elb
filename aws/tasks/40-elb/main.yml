@@ -1,0 +1,52 @@
+---
+
+- name: Create ELB Security group
+  tags:
+    - sg
+    - elb
+  ec2_group:
+    name: elb_security_group
+    description: an example EC2 group
+    vpc_id: "{{vpc.vpc_id }}"
+    region: "{{ vpc_region }}"
+    state: present
+    rules:
+    - proto: tcp
+      from_port: 80
+      to_port: 80
+      cidr_ip: 0.0.0.0/0
+    - proto: icmp
+      from_port: 8 # icmp type, -1 = any type
+      to_port:  -1 # icmp subtype, -1 = any subtype
+      cidr_ip: 0.0.0.0/0
+
+- name: crete elb
+  tags:
+    - ELB
+  ec2_elb_lb:
+    name: elb
+    region: "{{ vpc_region }}"
+    cross_az_load_balancing: yes
+    security_group_names: ['elb_security_group']
+    state: present
+    #zones: "{{ vpc_public_subnets_az }}"
+    subnets: "{{subnet_ids}}"
+    listeners:
+        - protocol: http # options are http, https, ssl, tcp
+          load_balancer_port: 80
+          instance_port: 80
+          proxy_protocol: True
+
+
+- name: Instance Register
+  tags:
+    - ELB
+  ec2_elb:
+      instance_id: "{{ item }}"
+      ec2_elbs: "elb"
+      state: present
+      region: "{{ vpc_region }}"
+  with_items: "{{ ids }}"
+
+- name: Refresh inventory
+  meta: refresh_inventory

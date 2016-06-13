@@ -1,0 +1,25 @@
+---
+- name: Create Security group
+  tags:
+    - sg
+    - web_servers_sg
+  ec2_group:
+    name: "{{ sg_name }}"
+    description: an example EC2 group
+    vpc_id: "{{vpc.vpc_id }}"
+    region: "{{ vpc_region }}"
+    state: present
+    rules:
+    - proto: tcp
+      from_port: 80
+      to_port: 80
+      cidr_ip: 0.0.0.0/0
+    - proto: tcp
+      from_port: 22
+      to_port: 22
+      cidr_ip: 0.0.0.0/0
+    - proto: icmp
+      from_port: 8 # icmp type, -1 = any type
+      to_port:  -1 # icmp subtype, -1 = any subtype
+      cidr_ip: 0.0.0.0/0
+

@@ -1,0 +1,20 @@
+---
+
+- name: vpc_subnet_ips
+  set_fact:
+    vpc_public_subnets_ips: "{{ vpc_public_subnets | map(attribute='cidr') | list }}"
+
+- name: vp subnet ips debug
+  debug: msg="{{ vpc_public_subnets_ips }}"
+
+- name: vpc_subnets_az
+  set_fact:
+    vpc_public_subnets_az: "{{ vpc_public_subnets | map(attribute='az') | list }}"
+
+- name: vp subnet az debug
+  debug: msg="{{ vpc_public_subnets_az }}"
+
+- name: vpc_subnet_ipss
+  set_fact:
+    version_file: "{{ lookup('file','aws/vars/aws.json') | from_json }}"
+
